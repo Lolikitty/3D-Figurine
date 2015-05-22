@@ -34,7 +34,7 @@ public class ChooseControl : MonoBehaviour {
 	}
 
 	IEnumerator LoadImg(){
-		WWW w = new WWW (@"file://C:\Users\Loli\Documents\New Unity Project 53\Assets\Texture\A.jpg");
+		WWW w = new WWW (@"file://C:\Users\Loli\Documents\GitHub\3D-Figurine\2. Unity Project\Assets\1. Project\3. Texture\1. Public\A.jpg");
 		yield return w;
 
 		www_Head_Texture = w.texture;
