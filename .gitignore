@@ -17,8 +17,8 @@
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
 
-2. Unity Project/ExportedObj/
-2. Unity Project/obj/
+# 2. Unity Project/ExportedObj/
+# 2. Unity Project/obj/
 
 *.svd
 *.userprefs
