@@ -8,8 +8,8 @@
 # Unity generated #
 # ===================================== #
 
-Unity Project/Temp/
-Unity Project/Library/
+2. Unity Project/Temp/
+2. Unity Project/Library/
 
 
 
@@ -17,10 +17,9 @@ Unity Project/Library/
 # Visual Studio / MonoDevelop generated #
 # ===================================== #
 
-Unity Project/App/ExportedObj/
-Unity Project/App/obj/
-Unity Project/Table/ExportedObj/
-Unity Project/Table/obj/
+2. Unity Project/ExportedObj/
+2. Unity Project/obj/
+
 *.svd
 *.userprefs
 *.csproj
