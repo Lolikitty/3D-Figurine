@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Collections;
+#if UNITY_EDITOR
+using System.IO;
+#endif
 
 public class ChooseControl : MonoBehaviour {
 
@@ -8,6 +10,7 @@ public class ChooseControl : MonoBehaviour {
 	public GameObject button_Face;
 	public GameObject button_Eyes;
 	public GameObject button_Mouth;
+	public GameObject button_Back;
 	public GameObject button_Next;
 
 	public ImageControl uiTexture_Face;
@@ -28,17 +31,32 @@ public class ChooseControl : MonoBehaviour {
 
 	Texture2D www_Head_Texture;
 
+	public static Texture2D NEW_FACE_TEXTURE;
+
+	public static Color AVERAGE_COLOR = Color.black;
+
+	public Show3D s3d;
+
+	void Awake(){
+		AVERAGE_COLOR = Color.black;
+	}
+
 	void Start () {
 		ButtonInit ();
 		StartCoroutine (LoadImg());
 	}
 
 	IEnumerator LoadImg(){
-		WWW w = new WWW (@"file://C:\Users\Loli\Documents\GitHub\3D-Figurine\2. Unity Project\Assets\1. Project\3. Texture\1. Public\A.jpg");
+		WWW w = new WWW (@"https://dl.dropboxusercontent.com/u/49791736/A.jpg");
 		yield return w;
 
 		www_Head_Texture = w.texture;
 
+//		TextureScale.Bilinear (www_Head_Texture, 1000, (int)(((float)w.texture.height / w.texture.width) * 1000));
+
+#if UNITY_EDITOR
+		File.WriteAllBytes (@"C:\Users\Loli\Desktop\A.png", www_Head_Texture.EncodeToPNG());
+#endif
 		head_texture.mainTexture = www_Head_Texture;
 
 	}
@@ -52,10 +70,70 @@ public class ChooseControl : MonoBehaviour {
 		UIEventListener.Get (button_Face2).onClick = Change_Face;
 		UIEventListener.Get (button_Face3).onClick = Change_Face;
 		UIEventListener.Get (button_Next).onClick = Button_Next;
+		UIEventListener.Get (button_Back).onClick = Button_Back;
+	}
+
+	void Button_Back(GameObject obj){
+		ToScene.GoTo (Scene.ImageCrop);
 	}
 
 	void Button_Next(GameObject obj){
-		Application.LoadLevel ("B");
+		if (www_Head_Texture != null) {
+			Texture2D t = new Texture2D (www_Head_Texture.width, www_Head_Texture.height);
+			t.SetPixels (www_Head_Texture.GetPixels ());
+		
+			Vector3 eyesV3 = uiTexture_Eyes.transform.localPosition;
+		
+			UITexture eyesTexture = uiTexture_Eyes.GetComponent<UITexture> ();
+		
+			// Get Face Average Color ------------------------------------------------------------------------------
+
+			for (int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++) {
+				for (int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++) {
+					int newX = (int)(x * 0.68f - eyesTexture.width / 2.5f) + 140;
+					int newY = (int)(y * 0.68f - eyesTexture.height / 3f) + 140;
+					if(y == (int)(eyesV3.y)){
+						if(AVERAGE_COLOR == Color.black){
+							AVERAGE_COLOR = www_Head_Texture.GetPixel(newX, newY);
+							print ("ok");
+						}
+						AVERAGE_COLOR = (www_Head_Texture.GetPixel(newX, newY) + AVERAGE_COLOR )/2;
+					}
+				}
+			}
+
+			// Using Face Average Color To Paint Background ------------------------------------------------------------------------------
+
+			for(int x = 0; x < www_Head_Texture.width; x++){
+				for(int y = 0; y < www_Head_Texture.height; y++){
+					t.SetPixel (x, y, AVERAGE_COLOR);
+				}
+			}
+
+			// Paint Eye L ------------------------------------------------------------------------------
+
+			int offsetEyeL_X = 0;
+			int offsetEyeL_Y = 100;
+
+			for (int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++) {
+				for (int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++) {
+					int newX = (int)(x * 0.68f - eyesTexture.width / 2.5f) + 140;
+					int newY = (int)(y * 0.68f - eyesTexture.height / 3f) + 140;
+					t.SetPixel (newX + offsetEyeL_X, newY + offsetEyeL_Y, www_Head_Texture.GetPixel(newX, newY));
+				}
+			}
+
+			// Paint Eye R ------------------------------------------------------------------------------
+
+
+			// -------------------------------------------------------------------------------------
+
+			t.Apply ();
+
+			NEW_FACE_TEXTURE = t;
+		}
+		ToScene.GoTo (Scene.Show3D);
+		s3d.Init ();
 	}
 
 	void Change_Face(GameObject obj){
@@ -113,26 +191,33 @@ public class ChooseControl : MonoBehaviour {
 		eyes2.transform.localPosition = new Vector3 (-uiTexture_Eyes.transform.localPosition.x, uiTexture_Eyes.transform.localPosition.y, uiTexture_Eyes.transform.localPosition.z);
 
 
-		if (www_Head_Texture != null) {
-			Texture2D t = new Texture2D (www_Head_Texture.width, www_Head_Texture.height);			
-			t.SetPixels (www_Head_Texture.GetPixels());			
-
-			Vector3 eyesV3 = uiTexture_Eyes.transform.localPosition;
-
-			UITexture eyesTexture = uiTexture_Eyes.GetComponent<UITexture>();
-
-			for(int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++){
-				for(int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++){
-					int newX = (int)(x * 0.68f - eyesTexture.width / 2.5f) + 140;
-					int newY = (int)(y * 0.68f - eyesTexture.height / 3f) + 140;
-					t.SetPixel(newX, newY, Color.red);
-				}
-			}
-
-			t.Apply ();
-
-			head_texture.mainTexture = t;
-		}
+//		if (www_Head_Texture != null) {
+//			Texture2D t = new Texture2D (www_Head_Texture.width, www_Head_Texture.height);			
+//			t.SetPixels (www_Head_Texture.GetPixels());			
+//
+//			Vector3 eyesV3 = uiTexture_Eyes.transform.localPosition;
+//
+//			UITexture eyesTexture = uiTexture_Eyes.GetComponent<UITexture>();
+//
+//			for(int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++){
+//				for(int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++){
+//					int newX = (int)(x * 0.68f - eyesTexture.width / 2.5f) + 140;
+//					int newY = (int)(y * 0.68f - eyesTexture.height / 3f) + 140;
+//
+////					t.SetPixel (newX, newY, www_Head_Texture.GetPixel(newX, newY));
+//					if(y == (int)(eyesV3.y)){
+//						t.SetPixel(newX, newY, Color.blue);
+//					}else{
+//						t.SetPixel(newX, newY, Color.red);
+//					}
+//				}
+//			}
+//
+//			t.Apply ();
+//
+//			head_texture.mainTexture = t;
+//
+//		}
 
 	}
 
