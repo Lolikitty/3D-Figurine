@@ -44,6 +44,10 @@ public class ImageCropControl : MonoBehaviour {
 	public float lockValue = 0;
 
 	Texture2D dragTexture;
+
+	bool isFreeControl = false; // Free or Fixed Control Image Scale
+
+	public static Texture2D CROP_TEXTURE;
 	
 	void Awake () {
 
@@ -51,6 +55,26 @@ public class ImageCropControl : MonoBehaviour {
 
 		ControlPointInit ();
 		SetControlEnable (controlEnable);
+
+
+		/*
+		 * 
+		 * You Can Enable You Need Fixed Control Point ,
+		 * But Now Only "controlPoint[4]" Can Use , 
+		 * Because Have A Little Problem... 
+		 * In The FreeControl() Function ...
+		 * 
+		 */
+		if(!isFreeControl){
+			controlPoint [0].SetActive (false);
+			controlPoint [1].SetActive (false);
+			controlPoint [2].SetActive (false);
+			controlPoint [3].SetActive (false);
+			controlPoint [4].SetActive (true);
+			controlPoint [5].SetActive (false);
+			controlPoint [6].SetActive (false);
+			controlPoint [7].SetActive (false);
+		}
 	}
 
 	void Start(){
@@ -127,22 +151,6 @@ public class ImageCropControl : MonoBehaviour {
 
 		float X = imgRT.anchoredPosition.x;
 		float Y = imgRT.anchoredPosition.y;
-
-//		float L = - controlPointWidth;
-//		float R = X + imgRT.sizeDelta.x / 2 ;
-//		float T = Y + imgRT.sizeDelta.y / 2 + controlPointHeight / 2;
-//		float B = Y + imgRT.sizeDelta.y - controlPointHeight / 2; // controlPointHeight
-//
-//
-//		ControlPointPosition [0] = new Vector2 (L, T);
-//		ControlPointPosition [1] = new Vector2 (X, T);
-//		ControlPointPosition [2] = new Vector2 (R, T);
-//		ControlPointPosition [3] = new Vector2 (R, Y);
-//		ControlPointPosition [4] = new Vector2 (R, B);
-//		ControlPointPosition [5] = new Vector2 (X, B);
-//		ControlPointPosition [6] = new Vector2 (L, B);
-//		ControlPointPosition [7] = new Vector2 (L, Y);
-//	
 
 		ControlPointPosition [0] = new Vector2 (- controlPointWidth, imgRT.sizeDelta.y);
 		ControlPointPosition [1] = new Vector2 (imgRT.sizeDelta.x / 2 - controlPointWidth/2, imgRT.sizeDelta.y);
@@ -257,6 +265,7 @@ public class ImageCropControl : MonoBehaviour {
 		newImg.Apply (false, false);
 		
 		ri.texture = newImg;
+		CROP_TEXTURE = newImg;
 	}
 
 	// Change Mouse icon
@@ -319,18 +328,60 @@ public class ImageCropControl : MonoBehaviour {
 	
 	void OnDrag_ControlPoint(BaseEventData data){
 
+		if (isFreeControl) {
+			FreeControl (data);
+		} else {
+			FixedControl (data);
+		}
+
+	}
+
+	void FixedControl(BaseEventData data){
 		PointerEventData p = (PointerEventData)data;
 		Vector2 dragVector = p.delta;
-
+		
 		GameObject obj = p.pointerPress;
-
+		
 		RectTransform rt = GetComponent <RectTransform>();
-
+		
 		float x = rt.anchoredPosition.x;
 		float y = rt.anchoredPosition.y;
 		int w = (int) rt.sizeDelta.x;
 		int h = (int) rt.sizeDelta.y;
 
+		// To Right Down
+		if(obj.name == "Control Point 4"){
+			float width = imgRT.sizeDelta.x + dragVector.x;		
+			if(width > minWidthLimit){
+				Vector2 delta = new Vector2(p.delta.x, 0);
+				Vector2 deltaMove = delta;
+				imgRT.sizeDelta += delta;
+				controlPoint[4].GetComponent<RectTransform>().anchoredPosition += deltaMove;
+			}
+
+			float height = imgRT.sizeDelta.y + dragVector.y;
+			if(height > minHeightLimit){
+				Vector2 delta = new Vector2(0, - p.delta.y);
+				Vector2 deltaMove = delta;
+				imgRT.sizeDelta += delta;
+				imgRT.anchoredPosition -= deltaMove;
+			}
+		}
+	}
+
+	void FreeControl(BaseEventData data){
+		PointerEventData p = (PointerEventData)data;
+		Vector2 dragVector = p.delta;
+		
+		GameObject obj = p.pointerPress;
+		
+		RectTransform rt = GetComponent <RectTransform>();
+		
+		float x = rt.anchoredPosition.x;
+		float y = rt.anchoredPosition.y;
+		int w = (int) rt.sizeDelta.x;
+		int h = (int) rt.sizeDelta.y;
+		
 		// To Top
 		if(obj.name == "Control Point 0" || obj.name == "Control Point 1" || obj.name == "Control Point 2"){
 			float height = imgRT.sizeDelta.y + dragVector.y;
@@ -366,7 +417,7 @@ public class ImageCropControl : MonoBehaviour {
 				controlPoint[5].GetComponent<RectTransform>().anchoredPosition += deltaMove/2;
 			}
 		}
-	
+		
 		// To Bottom
 		if(obj.name == "Control Point 4" || obj.name == "Control Point 5" || obj.name == "Control Point 6"){
 			float height = imgRT.sizeDelta.y + dragVector.y;
