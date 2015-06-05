@@ -25,7 +25,7 @@ public class ImageControl : MonoBehaviour {
 	public bool lockR = false;
 	public float lockValue = 0;
 
-	void Start () {
+	void Awake () {
 		ImageInit ();
 		ControlPointInit ();
 		SetControlEnable (controlEnable);
