@@ -2,4 +2,6 @@
 
 ###Unity 控制：
 
-<img src="https://raw.githubusercontent.com/Lolikitty/3D-Figurine/master/3.%20Github%20Data/ImageControl.jpg?token=AHtf8zKUWn-PxTuFkSPgrScXIhgPUfkzks5VZ_pGwA%3D%3D" />
+<img src="https://raw.githubusercontent.com/Lolikitty/3D-Figurine/master/3.%20Github%20Data/ImageControl.jpg?token=AHtf80P4xe66JM8kGhhXuTV8tRDCYDsdks5VeptYwA%3D%3D" />
+
+
