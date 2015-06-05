@@ -42,6 +42,8 @@ public class ImageCropControl : MonoBehaviour {
 	
 	public bool lockR = false;
 	public float lockValue = 0;
+
+	Texture2D dragTexture;
 	
 	void Awake () {
 
@@ -49,6 +51,16 @@ public class ImageCropControl : MonoBehaviour {
 
 		ControlPointInit ();
 		SetControlEnable (controlEnable);
+	}
+
+	void Start(){
+		dragTexture = new Texture2D (2, 2);
+		for(int y=0; y < dragTexture.height; y++){
+			for(int x = 0; x<dragTexture.width; x++){
+				dragTexture.SetPixel (x, y, new Color (1, 1, 1, 0.15f));
+			}
+		}
+		dragTexture.Apply ();
 	}
 
 	void Update(){
@@ -110,6 +122,10 @@ public class ImageCropControl : MonoBehaviour {
 
 		}
 //		ControlPointPositionRefresh ();
+
+
+		Refresh ();
+
 	}
 
 	public void ControlPointPositionRefresh(){
@@ -155,6 +171,19 @@ public class ImageCropControl : MonoBehaviour {
 
 	public void OnUp(){
 		initDrag = true;
+	}
+
+
+
+	public void OnBeginDrag(){
+		RawImage ri = GetComponent<RawImage> ();
+//		ri.color = new Color (0,0,0,0);
+		ri.texture = dragTexture;
+	}
+
+	public void OnEndDrag(){
+//		RawImage ri = GetComponent<RawImage> ();
+//		ri.color = new Color (1,1,1,1);
 	}
 
 	Texture2D newImg;
@@ -208,25 +237,23 @@ public class ImageCropControl : MonoBehaviour {
 		int w = (int)imgRT.sizeDelta.x;
 		int h = (int)imgRT.sizeDelta.y;
 
-		int offsetX = Screen.width / 2 - w / 2;
+		int offsetX = Screen.width / 2 - ImageCrop.RESCALE_IMG.width / 2;
 		int offsetX2 = ImageCrop.RESCALE_IMG.width - w;
 
-		print (offsetX2);
+		print (x - offsetX);
 
 		newImg = new Texture2D (w, h, TextureFormat.RGBA32, false);
 
 		float reScale = (float) Screen.width / Screen.height;
 
 		for (int yy = 0; yy < h; yy++) {
-			for(int xx = 0; xx < w - offsetX2; xx++) {
-
+			for(int xx = 0; xx < w; xx++) {
 //				if(x + xx - offsetX < 0 || x + xx - offsetX > w-1 || y + yy < 0 || y + yy > h){
 //					newImg.SetPixel(xx, yy, new Color(0,0,0,0));
 //				}else{
+//
 //				}
-				if(x + xx - offsetX > 0)
 				newImg.SetPixel(xx, yy, ImageCrop.RESCALE_IMG.GetPixel(x + xx - offsetX, y + yy));
-
 			}
 		}
 		
@@ -277,6 +304,9 @@ public class ImageCropControl : MonoBehaviour {
 
 	public void OnBeginDrag_ControlPoint (BaseEventData eventData){
 //		print ("--------------- Begin Drag");
+		RawImage ri = GetComponent<RawImage> ();
+//		ri.color = new Color (0,0,0,0);
+		ri.texture = dragTexture;
 	}
 	
 	public void OnEndDrag_ControlPoint (BaseEventData eventData){
@@ -284,6 +314,9 @@ public class ImageCropControl : MonoBehaviour {
 		if(!controlEnable){
 			return;
 		}
+//		RawImage ri = GetComponent<RawImage> ();
+//		ri.color = new Color (1,1,1,1);
+
 		//		obj.GetComponent<UITexture> ().alpha = 1;
 		//		foreach(GameObject cp in controlPoint){
 		//			cp.GetComponent<UITexture> ().alpha = 1;
