@@ -59,14 +59,18 @@ public class ImageCrop : MonoBehaviour {
 			downloadImage.GetComponent<RectTransform>().sizeDelta = rt.sizeDelta;
 			rt.anchoredPosition = new Vector2(Screen.width/2 - rt.sizeDelta.x/2, 0);
 
-			img.texture = newImg;
-			img.GetComponent<RectTransform>().sizeDelta = rt.sizeDelta;
-			img.GetComponent<RectTransform>().anchoredPosition = rt.anchoredPosition;
 
+			RectTransform imgRT = img.GetComponent<RectTransform>();
+			img.texture = newImg;
+			imgRT.sizeDelta = rt.sizeDelta / 2;
+			imgRT.anchoredPosition = new Vector2(Screen.width/2 - rt.sizeDelta.x/4, Screen.height/2 - rt.sizeDelta.y/4);
+
+
+			ImageCropControl icc = img.GetComponent<ImageCropControl>();
+			//		icc.SetControlEnable (true);
+			icc.ControlPointPositionRefresh ();
 		}
-		ImageCropControl icc = img.GetComponent<ImageCropControl>();
-//		icc.SetControlEnable (true);
-		icc.ControlPointPositionRefresh ();
+
 	}
 
 	public void Button_Next(){

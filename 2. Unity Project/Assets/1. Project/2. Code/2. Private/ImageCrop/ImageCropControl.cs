@@ -121,11 +121,6 @@ public class ImageCropControl : MonoBehaviour {
 			EventTrigger et = controlPoint[i].GetComponent<EventTrigger>();
 
 		}
-//		ControlPointPositionRefresh ();
-
-
-		Refresh ();
-
 	}
 
 	public void ControlPointPositionRefresh(){
@@ -162,6 +157,10 @@ public class ImageCropControl : MonoBehaviour {
 		for(int i = 0; i < controlPoint.Length; i++){
 			controlPoint[i].GetComponent<RectTransform>().anchoredPosition = ControlPointPosition[i];
 		}
+
+		//-------------------------------
+
+		Refresh ();
 	}
 
 	float tempDragMouseX;
@@ -221,7 +220,7 @@ public class ImageCropControl : MonoBehaviour {
 	float offsetR = 0;
 	float offsetL = 0;
 
-	void Refresh(){
+	public void Refresh(){
 
 		if (ImageCrop.DOWNLOAD_IMG == null)
 			return;
@@ -239,8 +238,6 @@ public class ImageCropControl : MonoBehaviour {
 
 		int offsetX = Screen.width / 2 - ImageCrop.RESCALE_IMG.width / 2;
 		int offsetX2 = ImageCrop.RESCALE_IMG.width - w;
-
-		print (x - offsetX);
 
 		newImg = new Texture2D (w, h, TextureFormat.RGBA32, false);
 
@@ -303,29 +300,22 @@ public class ImageCropControl : MonoBehaviour {
 	}
 
 	public void OnBeginDrag_ControlPoint (BaseEventData eventData){
-//		print ("--------------- Begin Drag");
+		if(!controlEnable){
+			return;
+		}
 		RawImage ri = GetComponent<RawImage> ();
-//		ri.color = new Color (0,0,0,0);
 		ri.texture = dragTexture;
 	}
 	
 	public void OnEndDrag_ControlPoint (BaseEventData eventData){
-//		print ("--------------- End Drag");
 		if(!controlEnable){
 			return;
 		}
-//		RawImage ri = GetComponent<RawImage> ();
-//		ri.color = new Color (1,1,1,1);
-
 		//		obj.GetComponent<UITexture> ().alpha = 1;
 		//		foreach(GameObject cp in controlPoint){
 		//			cp.GetComponent<UITexture> ().alpha = 1;
 		//		}
 	}
-
-
-	
-	//	float tempX = 0;
 	
 	void OnDrag_ControlPoint(BaseEventData data){
 
@@ -336,7 +326,6 @@ public class ImageCropControl : MonoBehaviour {
 
 		RectTransform rt = GetComponent <RectTransform>();
 
-//		Transform t = img.transform;
 		float x = rt.anchoredPosition.x;
 		float y = rt.anchoredPosition.y;
 		int w = (int) rt.sizeDelta.x;
@@ -413,8 +402,7 @@ public class ImageCropControl : MonoBehaviour {
 				controlPoint[5].GetComponent<RectTransform>().anchoredPosition += deltaMove/2;
 			}
 		}
-
-//		Refresh ();
+		// Refresh ();
 	}
 	
 	public void SetControlEnable(bool value){
