@@ -48,13 +48,10 @@ public class ImageCropControl : MonoBehaviour {
 
 	//---------------- Free or Fixed Control - Start
 	bool isFreeControl = false; // Free or Fixed Control Image Scale
-	float fixedWidth  = 289;
-	float fixedHeight = 375;
+	public static readonly float fixedWidth  = 289;
+	public static readonly float fixedHeight = 375;
 	//---------------- Free or Fixed Control - End
-
-
-	public static Texture2D CROP_TEXTURE;
-	
+				
 	void Awake () {
 
 		imgRT = GetComponent <RectTransform> ();
@@ -258,7 +255,7 @@ public class ImageCropControl : MonoBehaviour {
 		int offsetX = Screen.width / 2 - ImageCrop.RESCALE_IMG.width / 2;
 		int offsetX2 = ImageCrop.RESCALE_IMG.width - w;
 
-		newImg = new Texture2D (w, h, TextureFormat.RGBA32, false);
+		newImg = new Texture2D (w, h);
 
 		float reScale = (float) Screen.width / Screen.height;
 
@@ -273,10 +270,10 @@ public class ImageCropControl : MonoBehaviour {
 			}
 		}
 		
-		newImg.Apply (false, false);
+		newImg.Apply ();
 		
 		ri.texture = newImg;
-		CROP_TEXTURE = newImg;
+		TextureData.CROP_TEXTURE = newImg;
 	}
 
 	// Change Mouse icon

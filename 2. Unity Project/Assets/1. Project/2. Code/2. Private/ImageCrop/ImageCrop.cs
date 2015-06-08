@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.IO;
 
 public class ImageCrop : MonoBehaviour {
 
@@ -12,6 +13,8 @@ public class ImageCrop : MonoBehaviour {
 	public static Texture2D RESCALE_IMG;
 
 	public RectTransform mark;
+
+	public Texture2D circleMark;
 
 	void Awake(){
 		StartCoroutine (LoadImg());
@@ -33,7 +36,7 @@ public class ImageCrop : MonoBehaviour {
 	}
 
 	IEnumerator LoadImg(){
-		using (WWW w = new WWW (@"https://dl.dropboxusercontent.com/u/49791736/X.jpg")) {
+		using (WWW w = new WWW (@"https://dl.dropboxusercontent.com/u/49791736/A.jpg")) {
 			yield return w;
 
 			DOWNLOAD_IMG = w.texture;
@@ -74,6 +77,42 @@ public class ImageCrop : MonoBehaviour {
 	}
 
 	public void Button_Next(){
+
+		TextureData.CROP_TEXTURE_FIX = TextureData.CROP_TEXTURE;
+
+		TextureScale.Bilinear (TextureData.CROP_TEXTURE_FIX, (int)ImageCropControl.fixedWidth, (int)ImageCropControl.fixedHeight);
+
+
+		// --------------------------- Create Cricle Mark
+
+		Texture2D t = new Texture2D (circleMark.width, circleMark.height);
+		t.SetPixels (circleMark.GetPixels());
+		t.Apply ();
+		TextureScale.Bilinear (t, (int)ImageCropControl.fixedWidth, (int)ImageCropControl.fixedHeight);
+
+		// --------------------------- "AND-Compute" : Cricle Mark + TextureData.CROP_TEXTURE_FIX
+
+		Texture2D andImg = new Texture2D (t.width, t.height);
+
+		for(int y = 0; y < andImg.height; y++){
+			for(int x = 0; x < andImg.width; x++){
+				if(t.GetPixel(x, y).a != 0){
+					Color c = TextureData.CROP_TEXTURE_FIX.GetPixel(x, y);
+					c.a = t.GetPixel(x, y).a;
+					andImg.SetPixel(x, y, c);
+				}else{
+					andImg.SetPixel(x, y, new Color(0,0,0,0));
+				}
+			}
+		}
+
+		andImg.Apply ();
+
+		TextureData.CROP_TEXTURE_FIX_AND_CIRCLE = andImg;
+
+		// ---------------------------
+
+		GetComponent<ChooseControl> ().LoadImg ();
 		ToScene.GoTo (Scene.ImageControl);
 	}
 

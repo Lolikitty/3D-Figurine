@@ -42,22 +42,34 @@ public class ChooseControl : MonoBehaviour {
 	}
 
 	void Start () {
-		ButtonInit ();
-		StartCoroutine (LoadImg());
+
+//		StartCoroutine (LoadImg());
+//		LoadImg ();
 	}
 
-	IEnumerator LoadImg(){
-		WWW w = new WWW (@"https://dl.dropboxusercontent.com/u/49791736/A.jpg");
-		yield return w;
+	public void  LoadImg(){
 
-		www_Head_Texture = w.texture;
+		ButtonInit ();
+
+//		WWW w = new WWW (@"https://dl.dropboxusercontent.com/u/49791736/A.jpg");
+//		yield return w;
+
+		Texture2D t = new Texture2D (TextureData.CROP_TEXTURE_FIX_AND_CIRCLE.width, TextureData.CROP_TEXTURE_FIX_AND_CIRCLE.height);
+		t.SetPixels (TextureData.CROP_TEXTURE_FIX_AND_CIRCLE.GetPixels());
+		t.Apply ();
+
+		www_Head_Texture = t;
+
+//		www_Head_Texture = w.texture;
 
 //		TextureScale.Bilinear (www_Head_Texture, 1000, (int)(((float)w.texture.height / w.texture.width) * 1000));
+
+		head_texture.mainTexture = www_Head_Texture;
 
 #if UNITY_EDITOR
 		File.WriteAllBytes (@"C:\Users\Loli\Desktop\A.png", www_Head_Texture.EncodeToPNG());
 #endif
-		head_texture.mainTexture = www_Head_Texture;
+
 
 	}
 
