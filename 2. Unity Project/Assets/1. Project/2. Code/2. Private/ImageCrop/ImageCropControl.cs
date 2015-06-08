@@ -45,7 +45,13 @@ public class ImageCropControl : MonoBehaviour {
 
 	Texture2D dragTexture;
 
+
+	//---------------- Free or Fixed Control - Start
 	bool isFreeControl = false; // Free or Fixed Control Image Scale
+	float fixedWidth  = 289;
+	float fixedHeight = 375;
+	//---------------- Free or Fixed Control - End
+
 
 	public static Texture2D CROP_TEXTURE;
 	
@@ -148,6 +154,10 @@ public class ImageCropControl : MonoBehaviour {
 	}
 
 	public void ControlPointPositionRefresh(){
+		imgRT.sizeDelta = new Vector2(300, 300 * (fixedHeight / fixedWidth));
+		
+		//-------------------------------
+
 
 		float X = imgRT.anchoredPosition.x;
 		float Y = imgRT.anchoredPosition.y;
@@ -166,9 +176,10 @@ public class ImageCropControl : MonoBehaviour {
 			controlPoint[i].GetComponent<RectTransform>().anchoredPosition = ControlPointPosition[i];
 		}
 
-		//-------------------------------
-
+		//--------------------------------------
+				
 		Refresh ();
+
 	}
 
 	float tempDragMouseX;
@@ -351,21 +362,18 @@ public class ImageCropControl : MonoBehaviour {
 
 		// To Right Down
 		if(obj.name == "Control Point 4"){
-			float width = imgRT.sizeDelta.x + dragVector.x;		
+			float width = imgRT.sizeDelta.x + dragVector.x;
 			if(width > minWidthLimit){
 				Vector2 delta = new Vector2(p.delta.x, 0);
 				Vector2 deltaMove = delta;
 				imgRT.sizeDelta += delta;
 				controlPoint[4].GetComponent<RectTransform>().anchoredPosition += deltaMove;
+				imgRT.anchoredPosition = new Vector2(imgRT.anchoredPosition.x, imgRT.anchoredPosition.y - deltaMove.x*(fixedHeight / fixedWidth));
 			}
 
-			float height = imgRT.sizeDelta.y + dragVector.y;
-			if(height > minHeightLimit){
-				Vector2 delta = new Vector2(0, - p.delta.y);
-				Vector2 deltaMove = delta;
-				imgRT.sizeDelta += delta;
-				imgRT.anchoredPosition -= deltaMove;
-			}
+			// Fixed
+			imgRT.sizeDelta = new Vector2(imgRT.sizeDelta.x, imgRT.sizeDelta.x * (fixedHeight / fixedWidth));
+
 		}
 	}
 
@@ -381,7 +389,7 @@ public class ImageCropControl : MonoBehaviour {
 		float y = rt.anchoredPosition.y;
 		int w = (int) rt.sizeDelta.x;
 		int h = (int) rt.sizeDelta.y;
-		
+				
 		// To Top
 		if(obj.name == "Control Point 0" || obj.name == "Control Point 1" || obj.name == "Control Point 2"){
 			float height = imgRT.sizeDelta.y + dragVector.y;
