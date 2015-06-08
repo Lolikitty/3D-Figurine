@@ -37,6 +37,8 @@ public class ChooseControl : MonoBehaviour {
 
 	public Show3D s3d;
 
+	public Texture2D circleMark;
+
 	void Awake(){
 		AVERAGE_COLOR = Color.black;
 	}
@@ -125,7 +127,7 @@ public class ChooseControl : MonoBehaviour {
 			// Paint Eye L ------------------------------------------------------------------------------
 
 			int offsetEyeL_X = 0;
-			int offsetEyeL_Y = 100;
+			int offsetEyeL_Y = 0;
 
 			for (int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++) {
 				for (int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++) {
@@ -134,6 +136,48 @@ public class ChooseControl : MonoBehaviour {
 					t.SetPixel (newX + offsetEyeL_X, newY + offsetEyeL_Y, www_Head_Texture.GetPixel(newX, newY));
 				}
 			}
+
+			TextureData.LIFT_CROP_EYE = new Texture2D(eyesTexture.width+40, eyesTexture.height+30);
+
+			for (int x = 0; x < eyesTexture.width+40; x++) {
+				for (int y = 0; y < eyesTexture.height+30; y++) {
+					int newX = (int)((x+eyesV3.x) * 0.68f - eyesTexture.width / 2.5f) + 135;
+					int newY = (int)((y+eyesV3.x) * 0.68f - eyesTexture.height / 3f) + 120;
+					TextureData.LIFT_CROP_EYE.SetPixel (x,y, www_Head_Texture.GetPixel(newX, newY));
+				}
+			}
+
+			TextureData.LIFT_CROP_EYE.Apply();
+
+			Texture2D t2d = new Texture2D(circleMark.width, circleMark.height);
+			t2d.SetPixels(circleMark.GetPixels());
+			t2d.Apply();
+
+			TextureScale.Bilinear(t2d, TextureData.LIFT_CROP_EYE.width, TextureData.LIFT_CROP_EYE.height);
+
+			Texture2D andImg = new Texture2D(t2d.width, t2d.height);
+
+			for(int y = 0; y < andImg.height; y++){
+				for(int x = 0; x < andImg.width; x++){
+					if(t2d.GetPixel(x, y).a != 0){
+						Color c = TextureData.LIFT_CROP_EYE.GetPixel(x, y);
+						c.a = t2d.GetPixel(x, y).a;
+						andImg.SetPixel(x, y, c);
+					}else{
+						andImg.SetPixel(x, y, new Color(0,0,0,0));
+					}
+				}
+			}
+
+			andImg.Apply();
+
+
+			#if UNITY_EDITOR
+			File.WriteAllBytes (@"C:\Users\Loli\Desktop\B.png", andImg.EncodeToPNG());
+			#endif
+
+
+			// TextureData
 
 			// Paint Eye R ------------------------------------------------------------------------------
 
