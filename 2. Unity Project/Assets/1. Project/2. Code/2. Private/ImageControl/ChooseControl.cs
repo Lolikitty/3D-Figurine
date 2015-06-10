@@ -9,12 +9,14 @@ public class ChooseControl : MonoBehaviour {
 	public GameObject button_BG;
 	public GameObject button_Face;
 	public GameObject button_Eyes;
+	public GameObject button_Nose;
 	public GameObject button_Mouth;
 	public GameObject button_Back;
 	public GameObject button_Next;
 
 	public ImageControl uiTexture_Face;
 	public ImageControl uiTexture_Eyes;
+	public ImageControl uiTexture_Nose;
 	public ImageControl uiTexture_Mouth;
 
 	public GameObject eyes2;
@@ -30,8 +32,6 @@ public class ChooseControl : MonoBehaviour {
 	public UITexture head_texture;
 
 	Texture2D www_Head_Texture;
-
-	public static Texture2D NEW_FACE_TEXTURE;
 
 	public static Color AVERAGE_COLOR = Color.black;
 
@@ -79,6 +79,7 @@ public class ChooseControl : MonoBehaviour {
 		UIEventListener.Get (button_BG).onClick = Button_BG;
 		UIEventListener.Get (button_Face).onClick = Button_Face;
 		UIEventListener.Get (button_Eyes).onClick = Button_Eyes;
+		UIEventListener.Get (button_Nose).onClick = Button_Nose;
 		UIEventListener.Get (button_Mouth).onClick = Button_Mouth;
 		UIEventListener.Get (button_Face1).onClick = Change_Face;
 		UIEventListener.Get (button_Face2).onClick = Change_Face;
@@ -92,6 +93,51 @@ public class ChooseControl : MonoBehaviour {
 	}
 
 	void Button_Next(GameObject obj){
+
+
+		/***************************************************
+		 * 
+		 * If Texture Already Exists, Must Be Deleted
+		 * 
+		 */
+
+		if(TextureData.LEFT_CROP_EYE){
+			Destroy(TextureData.LEFT_CROP_EYE);
+			TextureData.LEFT_CROP_EYE = null;
+		}
+
+		if(TextureData.RIGHT_CROP_EYE){
+			Destroy(TextureData.RIGHT_CROP_EYE);
+			TextureData.RIGHT_CROP_EYE = null;
+		}
+
+		if(TextureData.LEFT_CROP_EYE_AND_CIRCLE){
+			Destroy(TextureData.LEFT_CROP_EYE_AND_CIRCLE);
+			TextureData.LEFT_CROP_EYE_AND_CIRCLE = null;
+		}
+
+		if(TextureData.RIGHT_CROP_EYE_AND_CIRCLE){
+			Destroy(TextureData.RIGHT_CROP_EYE_AND_CIRCLE);
+			TextureData.RIGHT_CROP_EYE_AND_CIRCLE = null;
+		}
+
+		if(TextureData.CROP_MOUTH){
+			Destroy(TextureData.CROP_MOUTH);
+			TextureData.CROP_MOUTH = null;
+		}
+
+		if(TextureData.CROP_MOUTH_AND_CIRCLE){
+			Destroy(TextureData.CROP_MOUTH_AND_CIRCLE);
+			TextureData.CROP_MOUTH_AND_CIRCLE = null;
+		}
+
+
+		/**************************************************************************************
+		 * 
+		 * Compute New Texture
+		 * 
+		 */
+
 		if (www_Head_Texture != null) {
 			Texture2D t = new Texture2D (www_Head_Texture.width, www_Head_Texture.height);
 			t.SetPixels (www_Head_Texture.GetPixels ());
@@ -109,7 +155,6 @@ public class ChooseControl : MonoBehaviour {
 					if(y == (int)(eyesV3.y)){
 						if(AVERAGE_COLOR == Color.black){
 							AVERAGE_COLOR = www_Head_Texture.GetPixel(newX, newY);
-							print ("ok");
 						}
 						AVERAGE_COLOR = (www_Head_Texture.GetPixel(newX, newY) + AVERAGE_COLOR )/2;
 					}
@@ -126,41 +171,33 @@ public class ChooseControl : MonoBehaviour {
 
 			// Paint Eye L ------------------------------------------------------------------------------
 
-			int offsetEyeL_X = 0;
-			int offsetEyeL_Y = 0;
+			TextureData.LEFT_CROP_EYE = new Texture2D(eyesTexture.width+40, eyesTexture.height+30); // + 40 + 30 = 增加貼圖切割範圍
 
-			for (int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++) {
-				for (int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++) {
-					int newX = (int)(x * 0.68f - eyesTexture.width / 2.5f) + 140;
-					int newY = (int)(y * 0.68f - eyesTexture.height / 3f) + 140;
-					t.SetPixel (newX + offsetEyeL_X, newY + offsetEyeL_Y, www_Head_Texture.GetPixel(newX, newY));
+			for (int x = 0; x < TextureData.LEFT_CROP_EYE.width; x++) {
+				for (int y = 0; y < TextureData.LEFT_CROP_EYE.height; y++) {
+					int newX = (int)((x+eyesV3.x) * 0.68f - eyesTexture.width / 2.5f) + 135;// + 135 往上調整，整體貼圖會往左
+					int newY = (int)((y+eyesV3.x) * 0.68f - eyesTexture.height / 3f) + 140; // + 140 往上調整，整體貼圖會往下
+					TextureData.LEFT_CROP_EYE.SetPixel (x,y, www_Head_Texture.GetPixel(newX, newY));
 				}
 			}
 
-			TextureData.LIFT_CROP_EYE = new Texture2D(eyesTexture.width+40, eyesTexture.height+30);
+			TextureData.LEFT_CROP_EYE.Apply();
 
-			for (int x = 0; x < eyesTexture.width+40; x++) {
-				for (int y = 0; y < eyesTexture.height+30; y++) {
-					int newX = (int)((x+eyesV3.x) * 0.68f - eyesTexture.width / 2.5f) + 135;
-					int newY = (int)((y+eyesV3.x) * 0.68f - eyesTexture.height / 3f) + 120;
-					TextureData.LIFT_CROP_EYE.SetPixel (x,y, www_Head_Texture.GetPixel(newX, newY));
-				}
-			}
 
-			TextureData.LIFT_CROP_EYE.Apply();
+			//  Using Left Eye AND-Compute to Circle
 
 			Texture2D t2d = new Texture2D(circleMark.width, circleMark.height);
 			t2d.SetPixels(circleMark.GetPixels());
 			t2d.Apply();
 
-			TextureScale.Bilinear(t2d, TextureData.LIFT_CROP_EYE.width, TextureData.LIFT_CROP_EYE.height);
+			TextureScale.Bilinear(t2d, TextureData.LEFT_CROP_EYE.width, TextureData.LEFT_CROP_EYE.height);
 
 			Texture2D andImg = new Texture2D(t2d.width, t2d.height);
 
 			for(int y = 0; y < andImg.height; y++){
 				for(int x = 0; x < andImg.width; x++){
 					if(t2d.GetPixel(x, y).a != 0){
-						Color c = TextureData.LIFT_CROP_EYE.GetPixel(x, y);
+						Color c = TextureData.LEFT_CROP_EYE.GetPixel(x, y);
 						c.a = t2d.GetPixel(x, y).a;
 						andImg.SetPixel(x, y, c);
 					}else{
@@ -171,23 +208,80 @@ public class ChooseControl : MonoBehaviour {
 
 			andImg.Apply();
 
-
-			#if UNITY_EDITOR
-			File.WriteAllBytes (@"C:\Users\Loli\Desktop\B.png", andImg.EncodeToPNG());
-			#endif
-
-
-			// TextureData
+			TextureData.LEFT_CROP_EYE_AND_CIRCLE = andImg;
 
 			// Paint Eye R ------------------------------------------------------------------------------
+
+			// Using Left Eye Mirror 
+
+			TextureData.RIGHT_CROP_EYE_AND_CIRCLE = new Texture2D(andImg.width, andImg.height);
+
+			for(int y = 0; y < andImg.height; y++){
+				for(int x = 0; x < andImg.width; x++){
+					TextureData.RIGHT_CROP_EYE_AND_CIRCLE.SetPixel(andImg.width - x, y, andImg.GetPixel(x, y));
+				}
+			}
+
+			TextureData.RIGHT_CROP_EYE_AND_CIRCLE.Apply();
+
+			// Paint Moush ------------------------------------------------------------------------------
+
+			UITexture mouthTexture = uiTexture_Mouth.GetComponent<UITexture>();
+
+			TextureData.CROP_MOUTH = new Texture2D(mouthTexture.width+80, mouthTexture.height+60); // + 40 + 30 = 增加貼圖切割範圍
+
+			Vector3 mouthV3 = uiTexture_Mouth.transform.localPosition;
+
+			for (int x = 0; x < TextureData.CROP_MOUTH.width; x++) {
+				for (int y = 0; y < TextureData.CROP_MOUTH.height; y++) {
+					int newX = (int)((x+mouthV3.x) * 0.68f - mouthTexture.width / 2.5f) + 125;// + 135 往上調整，整體貼圖會往左
+					int newY = (int)((y+mouthV3.x) * 0.68f - mouthTexture.height / 3f) + 60; // + 140 往上調整，整體貼圖會往下
+					TextureData.CROP_MOUTH.SetPixel (x,y, www_Head_Texture.GetPixel(newX, newY));
+				}
+			}
+			
+			TextureData.CROP_MOUTH.Apply();
+
+			//  Create Mouse Circle
+
+			Texture2D mouseCircle = new Texture2D(circleMark.width, circleMark.height);
+			mouseCircle.SetPixels(circleMark.GetPixels());
+			mouseCircle.Apply();
+			
+			TextureScale.Bilinear(mouseCircle, TextureData.CROP_MOUTH.width, TextureData.CROP_MOUTH.height);
+
+			//  Using Mouse AND-Compute to Circle
+
+			TextureData.CROP_MOUTH_AND_CIRCLE = new Texture2D(mouseCircle.width, mouseCircle.height);
+			
+			for(int y = 0; y < TextureData.CROP_MOUTH_AND_CIRCLE.height; y++){
+				for(int x = 0; x < TextureData.CROP_MOUTH_AND_CIRCLE.width; x++){
+					if(mouseCircle.GetPixel(x, y).a != 0){
+						Color c = TextureData.CROP_MOUTH.GetPixel(x, y);
+						c.a = mouseCircle.GetPixel(x, y).a;
+						TextureData.CROP_MOUTH_AND_CIRCLE.SetPixel(x, y, c);
+					}else{
+						TextureData.CROP_MOUTH_AND_CIRCLE.SetPixel(x, y, new Color(0,0,0,0));
+					}
+				}
+			}
+			
+			TextureData.CROP_MOUTH_AND_CIRCLE.Apply();
 
 
 			// -------------------------------------------------------------------------------------
 
 			t.Apply ();
-
-			NEW_FACE_TEXTURE = t;
 		}
+
+		// Set Position
+		TextureData.FACE_POSITION = uiTexture_Face.transform.localPosition;
+		TextureData.LEFT_EYE_POSITION = uiTexture_Eyes.transform.localPosition;
+		TextureData.RIGHT_POSITION = eyes2.transform.localPosition;
+		TextureData.NOSE_POSITION = uiTexture_Nose.transform.localPosition;
+		TextureData.MOUTH_POSITION = uiTexture_Mouth.transform.localPosition;
+
+
 		ToScene.GoTo (Scene.Show3D);
 		s3d.Init ();
 	}
@@ -208,36 +302,55 @@ public class ChooseControl : MonoBehaviour {
 	void Button_BG(GameObject obj){
 		uiTexture_Face.SetControlEnable (false);
 		uiTexture_Eyes.SetControlEnable (false);
+		uiTexture_Nose.SetControlEnable (false);
 		uiTexture_Mouth.SetControlEnable (false);
 	}
 
 	void Button_Face(GameObject obj){
 		uiTexture_Face.SetDepth (1);
 		uiTexture_Eyes.SetDepth (0);
+		uiTexture_Nose.SetDepth (0);
 		uiTexture_Mouth.SetDepth (0);
 
 		uiTexture_Face.SetControlEnable (true);
 		uiTexture_Eyes.SetControlEnable (false);
+		uiTexture_Nose.SetControlEnable (false);
 		uiTexture_Mouth.SetControlEnable (false);
 	}
 
 	void Button_Eyes(GameObject obj){
 		uiTexture_Face.SetDepth (0);
 		uiTexture_Eyes.SetDepth (1);
+		uiTexture_Nose.SetDepth (0);
 		uiTexture_Mouth.SetDepth (0);
 
 		uiTexture_Face.SetControlEnable (false);
 		uiTexture_Eyes.SetControlEnable (true);
+		uiTexture_Nose.SetControlEnable (false);
+		uiTexture_Mouth.SetControlEnable (false);
+	}
+
+	void Button_Nose(GameObject obj){
+		uiTexture_Face.SetDepth (0);
+		uiTexture_Eyes.SetDepth (0);
+		uiTexture_Nose.SetDepth (1);
+		uiTexture_Mouth.SetDepth (0);
+		
+		uiTexture_Face.SetControlEnable (false);
+		uiTexture_Eyes.SetControlEnable (false);
+		uiTexture_Nose.SetControlEnable (true);
 		uiTexture_Mouth.SetControlEnable (false);
 	}
 
 	void Button_Mouth(GameObject obj){
 		uiTexture_Face.SetDepth (0);
 		uiTexture_Eyes.SetDepth (0);
+		uiTexture_Nose.SetDepth (0);
 		uiTexture_Mouth.SetDepth (1);
 
 		uiTexture_Face.SetControlEnable (false);
 		uiTexture_Eyes.SetControlEnable (false);
+		uiTexture_Nose.SetControlEnable (false);
 		uiTexture_Mouth.SetControlEnable (true);
 	}
 
@@ -245,43 +358,15 @@ public class ChooseControl : MonoBehaviour {
 
 	void Update () {
 		eyes2.transform.localPosition = new Vector3 (-uiTexture_Eyes.transform.localPosition.x, uiTexture_Eyes.transform.localPosition.y, uiTexture_Eyes.transform.localPosition.z);
-
-
-//		if (www_Head_Texture != null) {
-//			Texture2D t = new Texture2D (www_Head_Texture.width, www_Head_Texture.height);			
-//			t.SetPixels (www_Head_Texture.GetPixels());			
-//
-//			Vector3 eyesV3 = uiTexture_Eyes.transform.localPosition;
-//
-//			UITexture eyesTexture = uiTexture_Eyes.GetComponent<UITexture>();
-//
-//			for(int x = (int)(eyesV3.x); x < eyesV3.x + eyesTexture.width+20; x++){
-//				for(int y = (int)(eyesV3.y); y < eyesV3.y + eyesTexture.height+20; y++){
-//					int newX = (int)(x * 0.68f - eyesTexture.width / 2.5f) + 140;
-//					int newY = (int)(y * 0.68f - eyesTexture.height / 3f) + 140;
-//
-////					t.SetPixel (newX, newY, www_Head_Texture.GetPixel(newX, newY));
-//					if(y == (int)(eyesV3.y)){
-//						t.SetPixel(newX, newY, Color.blue);
-//					}else{
-//						t.SetPixel(newX, newY, Color.red);
-//					}
-//				}
-//			}
-//
-//			t.Apply ();
-//
-//			head_texture.mainTexture = t;
-//
-//		}
-
+		eyes2.GetComponent<UITexture> ().width = uiTexture_Eyes.GetComponent<UITexture> ().width;
+		eyes2.GetComponent<UITexture> ().height = uiTexture_Eyes.GetComponent<UITexture> ().height;
 	}
 
-	void OnGUI(){
-		GUILayout.Label ("Choose Face : " + CHOOSE_FACE);
-		GUILayout.Label ("Face :     Position : " + uiTexture_Face.transform.localPosition + " \t Scale : " + uiTexture_Face.GetComponent<UITexture>().width + ", " + uiTexture_Face.GetComponent<UITexture>().height);
-		GUILayout.Label ("Eye :      Position : " + uiTexture_Eyes.transform.localPosition + " \t Scale : " + uiTexture_Eyes.GetComponent<UITexture>().width + ", " + uiTexture_Eyes.GetComponent<UITexture>().height);
-		GUILayout.Label ("Mouth :   Position : " + uiTexture_Mouth.transform.localPosition + " \t Scale : " + uiTexture_Mouth.GetComponent<UITexture>().width + ", " + uiTexture_Mouth.GetComponent<UITexture>().height);
-	}
+//	void OnGUI(){
+//		GUILayout.Label ("Choose Face : " + CHOOSE_FACE);
+//		GUILayout.Label ("Face :     Position : " + uiTexture_Face.transform.localPosition + " \t Scale : " + uiTexture_Face.GetComponent<UITexture>().width + ", " + uiTexture_Face.GetComponent<UITexture>().height);
+//		GUILayout.Label ("Eye :      Position : " + uiTexture_Eyes.transform.localPosition + " \t Scale : " + uiTexture_Eyes.GetComponent<UITexture>().width + ", " + uiTexture_Eyes.GetComponent<UITexture>().height);
+//		GUILayout.Label ("Mouth :   Position : " + uiTexture_Mouth.transform.localPosition + " \t Scale : " + uiTexture_Mouth.GetComponent<UITexture>().width + ", " + uiTexture_Mouth.GetComponent<UITexture>().height);
+//	}
 
 }

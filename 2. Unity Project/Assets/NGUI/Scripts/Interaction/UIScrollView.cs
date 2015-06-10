@@ -374,12 +374,14 @@ public class UIScrollView : MonoBehaviour
 		if (horizontalScrollBar != null)
 		{
 			EventDelegate.Add(horizontalScrollBar.onChange, OnScrollBar);
+			horizontalScrollBar.BroadcastMessage("CacheDefaultColor", SendMessageOptions.DontRequireReceiver);
 			horizontalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveHorizontally) ? 1f : 0f;
 		}
 
 		if (verticalScrollBar != null)
 		{
 			EventDelegate.Add(verticalScrollBar.onChange, OnScrollBar);
+			verticalScrollBar.BroadcastMessage("CacheDefaultColor", SendMessageOptions.DontRequireReceiver);
 			verticalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveVertically) ? 1f : 0f;
 		}
 	}
@@ -1003,6 +1005,22 @@ public class UIScrollView : MonoBehaviour
 			// Dampen the momentum
 			mScroll = 0f;
 			NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+		}
+	}
+
+	/// <summary>
+	/// Pan the scroll view.
+	/// </summary>
+
+	public void OnPan (Vector2 delta)
+	{
+		if (horizontalScrollBar != null) horizontalScrollBar.OnPan(delta);
+		if (verticalScrollBar != null) verticalScrollBar.OnPan(delta);
+
+		if (horizontalScrollBar == null && verticalScrollBar == null)
+		{
+			if (scale.x != 0f) Scroll(delta.x);
+			else if (scale.y != 0f) Scroll(delta.y);
 		}
 	}
 

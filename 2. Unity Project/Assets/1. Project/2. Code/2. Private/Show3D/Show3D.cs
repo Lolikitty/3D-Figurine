@@ -3,83 +3,47 @@ using System.Collections;
 
 public class Show3D : MonoBehaviour {
 
+	public UITexture face;
+	public UITexture eyeLeft;
+	public UITexture eyeRight;
+	public UITexture mouth;
+
+
 	public GameObject button_Back;
-
 	public Color ac;
-
-//	[Range(0.0f, 1.0f)]
-	float small = 0.1f;
-
-//	[Range(0.0f, 1.0f)]
-	float large = 0.2f; 
-
-	float value = 0.2f;
 
 	void Awake(){
 		UIEventListener.Get (button_Back).onClick = Button_Back;
 	}
 
 	void Button_Back(GameObject obj){
-		print ("okokok");
 		ToScene.GoTo (Scene.ImageControl);
 	}
 
 	public void Init () {
 
+		// 皮膚平均色 :D
 		ac = ChooseControl.AVERAGE_COLOR;
 
+		// Face
+		face.mainTexture = TextureData.CROP_TEXTURE_FIX_AND_CIRCLE;
+		face.width = TextureData.CROP_TEXTURE_FIX_AND_CIRCLE.width;
+		face.height = TextureData.CROP_TEXTURE_FIX_AND_CIRCLE.height;
 
+		// Left Eye
+		eyeLeft.mainTexture = TextureData.LEFT_CROP_EYE_AND_CIRCLE;
+		eyeLeft.width = TextureData.LEFT_CROP_EYE_AND_CIRCLE.width;
+		eyeLeft.height = TextureData.LEFT_CROP_EYE_AND_CIRCLE.height;
 
-//		Texture2D t = ChooseControl.NEW_FACE_TEXTURE;
-//
-//
-//
-//		for(int y = 0; y < t.height; y++){
-//			for(int x = 0; x < t.width; x++){
-//				float gs = t.GetPixel(x, y).grayscale;
-//				float r = t.GetPixel(x, y).r;
-//				float g = t.GetPixel(x, y).g;
-//				float b = t.GetPixel(x, y).b;
-//				
-//				if(
-//				      r < g + value && r > g - value
-//				   && r < b + value && r > b - value
-//
-//				   && g < r + value && g > r - value
-//				   && g < b + value && g > b - value
-//
-//				   && b < r + value && b > r - value
-//			       && b < g + value && b > g - value
-//				   ){
-//
-//				}else{
-//					t.SetPixel(x, y, ac);
-//				}
-//			}
-//		}
+		// Right Eye
+		eyeRight.mainTexture = TextureData.RIGHT_CROP_EYE_AND_CIRCLE;
+		eyeRight.width = TextureData.RIGHT_CROP_EYE_AND_CIRCLE.width;
+		eyeRight.height = TextureData.RIGHT_CROP_EYE_AND_CIRCLE.height;
 
-
-
-
-//		for(int y = 0; y < t.height; y++){
-//			for(int x = 0; x < t.width; x++){
-//				float gs = t.GetPixel(x, y).grayscale;
-//				float r = t.GetPixel(x, y).r;
-//				float g = t.GetPixel(x, y).g;
-//				float b = t.GetPixel(x, y).b;
-//
-//				if(r > ac.r - 0.28f && r < ac.r + small
-//				   && g > ac.g - large && g < ac.g + small
-//				   && b > ac.b - large && b < ac.b + small){
-//						t.SetPixel(x, y, ac);
-//				}
-//			}
-//		}
-
-//		t.Apply ();
-
-		GetComponent<Renderer> ().material.mainTexture = ChooseControl.NEW_FACE_TEXTURE;
-
+		// Mouth
+		mouth.mainTexture = TextureData.CROP_MOUTH_AND_CIRCLE;
+		mouth.width = TextureData.CROP_MOUTH_AND_CIRCLE.width;
+		mouth.height = TextureData.CROP_MOUTH_AND_CIRCLE.height;
 
 	}
 

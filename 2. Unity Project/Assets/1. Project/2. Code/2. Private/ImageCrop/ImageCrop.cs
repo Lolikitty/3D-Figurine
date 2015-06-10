@@ -49,8 +49,6 @@ public class ImageCrop : MonoBehaviour {
 			int newWidth = (int)(imggMaxSize *((float)w.texture.width / w.texture.height));
 			int newHeight = imggMaxSize;
 
-			print (newWidth + " , " + newHeight);
-
 			TextureScale.Bilinear(newImg, newWidth, newHeight);
 
 			RESCALE_IMG = newImg;
