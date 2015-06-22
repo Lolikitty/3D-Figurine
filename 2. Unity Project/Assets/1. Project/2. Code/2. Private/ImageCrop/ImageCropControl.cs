@@ -122,10 +122,10 @@ public class ImageCropControl : MonoBehaviour {
 			// ----------------------------------- Add EventTrigger
 
 			EventTrigger trigger = controlPoint[i].GetComponent<EventTrigger>();
-			trigger.delegates = new List<EventTrigger.Entry>();
-			trigger.delegates.Add(entry);
-			trigger.delegates.Add(entry2);
-			trigger.delegates.Add(entry3);
+			trigger.triggers = new List<EventTrigger.Entry>();
+			trigger.triggers.Add(entry);
+			trigger.triggers.Add(entry2);
+			trigger.triggers.Add(entry3);
 			// ----------------------------------- OnEnter
 
 			EventTriggerListener.Get(controlPoint[i]).onEnter = ControlPointEnter;
